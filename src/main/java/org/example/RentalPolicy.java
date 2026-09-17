@@ -2,12 +2,6 @@ package org.example;
 
 import java.util.Objects;
 
-/**
- * Автокөлік жалдау күйлерінің өту ережелері.
- *
- * Рұқсат: Reserved -> Rented, Rented -> Returned
- * Тыйым:  Reserved -> Returned, Returned -> Rented
- */
 public final class RentalPolicy {
 
     /**
