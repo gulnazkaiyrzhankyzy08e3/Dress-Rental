@@ -5,7 +5,7 @@ import java.util.Objects;
 public final class RentalPolicy {
 
     /**
-     * Өтуге тырысады. Рұқсат етілсе — жаңа күйді қайтарады,
+     * Статусқа өтуге тырысады. Рұқсат етілсе — жаңа статусты қайтарады,
      * әйтпесе IllegalStateException лақтырады.
      */
     public RentalStatus move(RentalStatus from, RentalStatus to) {
@@ -20,7 +20,7 @@ public final class RentalPolicy {
         return to;
     }
 
-    /** Өту рұқсат па? */
+    /** Статусқа өту рұқсат па? */
     public boolean isAllowed(RentalStatus from, RentalStatus to) {
         if (from instanceof RentalStatus.Reserved) {
             return to instanceof RentalStatus.Rented;
@@ -28,7 +28,7 @@ public final class RentalPolicy {
         if (from instanceof RentalStatus.Rented) {
             return to instanceof RentalStatus.Returned;
         }
-        return false; // Returned — соңғы күй, одан ары өту жоқ
+        return false; // Returned — соңғы статус, одан ары өту жоқ
     }
 
     private String reasonForRefusal(RentalStatus from, RentalStatus to) {
