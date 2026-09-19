@@ -3,7 +3,7 @@ package org.example;
 import java.util.Objects;
 
 /**
- * Автокөлік жалдау жазбасының идентификаторы.
+ * Автокөлік жалдау статусының идентификаторы.
  * null немесе бос жол бола алмайды.
  */
 public record RentalId(String value) {
