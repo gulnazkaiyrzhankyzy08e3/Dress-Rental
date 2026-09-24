@@ -2,10 +2,8 @@ package org.example;
 
 import java.util.Objects;
 
-/**
- * Автокөлік жалдау статусының идентификаторы.
- * null немесе бос жол бола алмайды.
- */
+ello
+
 public record RentalId(String value) {
 
     public RentalId {
