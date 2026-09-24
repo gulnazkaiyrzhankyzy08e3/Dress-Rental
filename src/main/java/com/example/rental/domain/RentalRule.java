@@ -1,4 +1,5 @@
 package com.example.rental.domain;
 
-public class RentalRule {
+public interface RentalRule {
+    void check(RentalStatus from, RentalStatus to);
 }
