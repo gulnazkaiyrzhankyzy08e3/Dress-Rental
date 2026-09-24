@@ -1,13 +1,18 @@
 package com.example.rental.domain;
 
+import java.util.List;
+
 public class RentalPolicy {
+    private final List\<RentalRule> rules;
+
+    public RentalPolicy(List\<RentalRule> rules) {
+        this.rules = rules;
+    }
+
     public RentalStatus move(RentalStatus from, RentalStatus to) {
-        if (from instanceof RentalStatus.Booked && to instanceof RentalStatus.Rented) {
-            return to;
+        for (RentalRule rule : rules) {
+            rule.check(from, to);
         }
-        if (from instanceof RentalStatus.Rented && to instanceof RentalStatus.Returned) {
-            return to;
-        }
-        throw new IllegalStateException("Forbidden status change: " + from + " -> " + to);
+        return to;
     }
 }
