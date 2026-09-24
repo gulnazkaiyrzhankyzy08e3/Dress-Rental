@@ -1,27 +1,30 @@
-# Car Rental
+# Product
+Dress Rental Service. People track dress rental orders.
 
-## Product
+# Core item
+RentalId
 
-Car Rental Management System is a system for managing car rentals.
-A client books a car, takes it on the agreed date, and returns it after the rental period.
+# Status table
+| From | To | Allowed | Reason |
+| :--- | :--- | :--- | :--- |
+| Booked | Rented | Yes | Customer picked up the dress. |
+| Rented | Returned | Yes | Customer returned the dress back. |
+| Booked | Returned | No | Cannot return a dress that was never picked up. |
+| Returned | Booked | No | Completed order cannot be re-booked directly. |
 
-## Core item
+# Forbidden — why
+1. **Booked -> Returned:** A dress cannot be marked as returned without first being handed over to the client.
+2. **Returned -> Booked:** A completed rental cycle cannot be reset; a new booking requires a new rental order ID.
 
-The core item is Rental — one rental record for one car and one client.
-
-The RentalId identifies the rental and cannot be null or blank.
-
-## Status table
-
-| From | To | Allowed |
-|---|---|---|
-| Reserved | Rented | Yes |
-| Rented | Returned | Yes |
-| Reserved | Returned | No |
-| Returned | Rented | No |
-
-## Forbidden — why
-
-**Reserved → Returned** — forbidden because the car was not handed over to the client yet.
-
-**Returned → Rented** — forbidden because a completed rental cannot be reopened. A new rental must be created.
+# Package Architecture (Lab 2)
+```text
+  dto         client        handler         config
+  (JSON)      (HTTP)        (HTTP)         Application
+                                           @Service
+        \            \            /           |
+         \            \          /       injects Rule
+          \            \        /
+                    domain
+              RentalId  RentalStatus  RentalPolicy
+              RentalRule + two implementations
+                    (no Spring)
