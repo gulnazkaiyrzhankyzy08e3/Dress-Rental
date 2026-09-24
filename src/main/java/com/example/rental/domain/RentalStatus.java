@@ -1,4 +1,11 @@
 package com.example.rental.domain;
 
-public class RentalStatus {
+public sealed interface RentalStatus permits 
+    RentalStatus.Booked, 
+    RentalStatus.Rented, 
+    RentalStatus.Returned {
+
+    record Booked() implements RentalStatus {}
+    record Rented() implements RentalStatus {}
+    record Returned() implements RentalStatus {}
 }
