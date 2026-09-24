@@ -3,9 +3,9 @@ package com.example.rental.domain;
 import java.util.List;
 
 public class RentalPolicy {
-    private final List\<RentalRule> rules;
+    private final List<RentalRule> rules;
 
-    public RentalPolicy(List\<RentalRule> rules) {
+    public RentalPolicy(List<RentalRule> rules) {
         this.rules = rules;
     }
 
