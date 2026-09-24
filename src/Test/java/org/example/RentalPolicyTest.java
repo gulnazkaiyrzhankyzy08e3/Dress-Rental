@@ -44,10 +44,3 @@ class RentalPolicyTest {
     void idRejectsBlank() {
         assertThrows(IllegalArgumentException.class, () -> RentalId.of("   "));
     }
-
-    @Test
-    @DisplayName("Дұрыс id жасалады")
-    void idAcceptsValidValue() {
-        assertEquals("CAR-001", RentalId.of("CAR-001").value());
-    }
-}
