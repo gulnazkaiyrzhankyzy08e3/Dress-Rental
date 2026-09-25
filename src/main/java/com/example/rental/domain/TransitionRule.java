@@ -9,4 +9,4 @@ public class TransitionRule implements RentalRule {
         throw new IllegalStateException("Бұлай ауыстыруға болмайды!");
     }
 }
-//Бұл класс — біздің жүйедегі «Өту ережесі» (Transition Rule). Оның негізгі міндеті — көйлектің статусы тек дұрыс ретпен өтуін қадағалау 
+
