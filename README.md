@@ -15,16 +15,3 @@ RentalId
 # Forbidden - why
 1. **Booked -> Returned:** A dress cannot be marked as returned without first being handed over to the client.
 2. **Returned -> Booked:** A completed rental cycle cannot be reset; a new booking requires a new rental order ID.
-
-# Package Architecture (Lab 2)
-```text
-  dto         client        handler         config
-  (JSON)      (HTTP)        (HTTP)         Application
-                                           @Service
-        \            \            /           |
-         \            \          /       injects Rule
-          \            \        /
-                    domain
-              RentalId  RentalStatus  RentalPolicy
-              RentalRule + two implementations
-                    (no Spring)
