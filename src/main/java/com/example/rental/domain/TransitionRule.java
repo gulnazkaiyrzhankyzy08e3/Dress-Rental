@@ -3,10 +3,13 @@ package com.example.rental.domain;
 public class TransitionRule implements RentalRule {
     @Override
     public void check(RentalStatus from, RentalStatus to) {
-        if (from instanceof RentalStatus.Booked && to instanceof RentalStatus.Rented) return;
-        if (from instanceof RentalStatus.Rented && to instanceof RentalStatus.Returned) return;
-
-        throw new IllegalStateException("Бұлай ауыстыруға болмайды!");
+        if (from instanceof RentalStatus.Booked && to instanceof RentalStatus.Rented) {
+            return;
+        }
+        if (from instanceof RentalStatus.Rented && to instanceof RentalStatus.Returned) {
+            return;
+        }
+        throw new IllegalStateException("Forbidden status transition: " + from + " -> " + to);
     }
 }
 

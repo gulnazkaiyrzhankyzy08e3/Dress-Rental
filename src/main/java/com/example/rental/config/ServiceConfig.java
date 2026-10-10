@@ -1,18 +1,15 @@
 package com.example.rental.config;
 
-import com.example.rental.domain.*;
+import com.example.rental.domain.RentalRule;
+import com.example.rental.domain.TransitionRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
-@Configurationpublic class ServiceConfig {
+@Configuration
+public class ServiceConfig {
 
     @Bean
-    public RentalPolicy rentalPolicy() {
-        return new RentalPolicy(List.of(
-            new TransitionRule(),
-            new StopFactorRule()
-        ));
+    public RentalRule rentalRule() {
+        return new TransitionRule();
     }
 }
