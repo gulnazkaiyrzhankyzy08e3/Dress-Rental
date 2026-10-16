@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configurationpublic class ServiceConfig {
+@Configuration
+    public class ServiceConfig {
 
     @Bean
     public RentalPolicy rentalPolicy() {
