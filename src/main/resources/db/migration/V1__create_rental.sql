@@ -7,3 +7,4 @@ CREATE TABLE rental (
                         CONSTRAINT rental_status_known
                             CHECK (status IN ('BOOKED', 'RENTED', 'RETURNED'))
 );
+ 
