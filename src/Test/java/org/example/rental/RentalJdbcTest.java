@@ -1,11 +1,11 @@
-
 package org.example.rental;
 
 import com.example.rental.config.Application;
 import com.example.rental.config.RentalService;
 import com.example.rental.domain.DuplicateRental;
-import com.example.rental.persistence.RentalJdbc;
+import com.example.rental.persistence.RentalJpa;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest(classes = Application.class)
 class RentalJdbcTest {
 
@@ -21,10 +22,15 @@ class RentalJdbcTest {
     private RentalService service;
 
     @Autowired
-    private RentalJdbc repository;
+    private RentalJpa repository;
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @BeforeEach
+    void empty() {
+        jdbc.update("DELETE FROM rental");
+    }
 
     @Test
     void rollbackLeavesZeroRows() {
