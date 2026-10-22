@@ -3,7 +3,7 @@ package com.example.rental.persistence;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-
+ 
 @Entity
 @Table(name = "rental")
 public class RentalEntity {
