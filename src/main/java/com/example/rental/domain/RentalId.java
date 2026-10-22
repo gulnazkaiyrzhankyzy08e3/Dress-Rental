@@ -6,6 +6,6 @@ public record RentalId(String value) {
             throw new IllegalArgumentException("ID бос болмауы керек!");
         }
     }
-}
+} 
 
 
