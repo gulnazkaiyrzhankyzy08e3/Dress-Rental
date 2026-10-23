@@ -13,7 +13,7 @@ public class StopFactorRule implements RentalRule {
 
     @Override
     public void check(RentalStatus from, RentalStatus to) {
-        // Егер көйлек бүлінген болса, оны қайта жалға беруді бұғаттайды
+        
         if (isDamaged && to instanceof RentalStatus.Rented) {
             throw new IllegalStateException("Cannot rent dress: item is marked as damaged");
         }
