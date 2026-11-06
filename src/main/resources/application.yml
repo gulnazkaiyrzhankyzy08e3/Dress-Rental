@@ -1,6 +1,11 @@
+
 spring:
   profiles:
     default: dev
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   jpa:
     hibernate:
@@ -36,4 +41,5 @@ info:
 
 springdoc:
   swagger-ui:
-    enabled: false
+    enabled: true
+    path: /swagger-ui.html
