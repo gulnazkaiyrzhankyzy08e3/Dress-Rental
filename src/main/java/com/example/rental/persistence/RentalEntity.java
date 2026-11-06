@@ -23,9 +23,12 @@ public class RentalEntity {
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getBusinessKey() { return businessKey; }
+    public UUID getId()
+    { return id; }
+    public void setId(UUID id)
+    { this.id = id; }
+    public String getBusinessKey() {
+        return businessKey; }
     public void setBusinessKey(String businessKey) { this.businessKey = businessKey; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

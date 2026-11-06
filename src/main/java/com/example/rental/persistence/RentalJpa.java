@@ -1,7 +1,10 @@
+
 package com.example.rental.persistence;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class RentalJpa {
@@ -14,6 +17,11 @@ public class RentalJpa {
 
     public void insert(RentalEntity rental) {
         em.persist(rental);
+    }
+
+    public Optional<RentalEntity> findById(UUID id) {
+        return Optional.ofNullable(
+                em.find(RentalEntity.class, id));
     }
 
     public int count(String businessKey) {

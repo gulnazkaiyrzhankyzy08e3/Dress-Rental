@@ -1,8 +1,10 @@
+
 package com.example.rental.config;
 
 import com.example.rental.domain.*;
 import com.example.rental.persistence.RentalJpa;
 import com.example.rental.persistence.RentalMapper;
+import com.example.rental.persistence.RentalEntity;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,36 @@ public class RentalService {
     }
 
     @Transactional
-    public void createRental(String businessKey, String title) {
+    public RentalView createRental(String businessKey, String title) {
+        UUID id = UUID.randomUUID();
+
         try {
-            repository.insert(RentalMapper.toEntity(
-                    UUID.randomUUID(), businessKey,
-                    new RentalStatus.Booked(), title));
+            RentalEntity entity = RentalMapper.toEntity(
+                    id, businessKey,
+                    new RentalStatus.Booked(), title);
+
+            repository.insert(entity);
             repository.flush();
+
+            return new RentalView(
+                    id, businessKey, "BOOKED", title);
+
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateRental(businessKey);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public RentalView require(UUID id) {
+        RentalEntity entity = repository.findById(id)
+                .orElseThrow(MissingRental::new);
+
+        return new RentalView(
+                entity.getId(),
+                entity.getBusinessKey(),
+                entity.getStatus(),
+                entity.getTitle()
+        );
     }
 
     @Transactional
