@@ -2,15 +2,22 @@
 package com.example.rental.handler;
 
 import com.example.rental.config.RentalService;
+import com.example.rental.security.SecurityConfig;
 import com.example.rental.domain.DuplicateRental;
 import com.example.rental.domain.MissingRental;
 import com.example.rental.domain.RentalView;
+import com.example.rental.config.Application;
+import org.springframework.test.context.ContextConfiguration;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
@@ -20,15 +27,25 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(RentalController.class)
+
+@ActiveProfiles("dev")
+@WebMvcTest(
+        controllers = RentalController.class,
+        excludeAutoConfiguration = {}
+)
 @ContextConfiguration(classes = {
+        Application.class,
         RentalController.class,
-        ApiErrors.class
+        ApiErrors.class,
+        SecurityConfig.class
 })
 class RentalControllerTest {
 
+
     @Autowired
     private MockMvc mvc;
+
+    @MockBean private JwtDecoder jwtDecoder;
 
     @MockBean
     private RentalService service;
@@ -41,7 +58,7 @@ class RentalControllerTest {
                 .thenReturn(new RentalView(
                         id, "RENT-001", "BOOKED", "Blue dress"));
 
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .content("""
                                 {"businessKey":"RENT-001","title":"Blue dress"}
@@ -55,7 +72,7 @@ class RentalControllerTest {
 
     @Test
     void blankTitleReturns400() throws Exception {
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .header("X-Correlation-Id", "test-123")
                         .content("""
@@ -78,7 +95,7 @@ class RentalControllerTest {
         when(service.require(id))
                 .thenThrow(new MissingRental());
 
-        mvc.perform(get("/api/v1/rentals/" + id))
+        mvc.perform(get("/api/v1/rentals/" + id).with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF"))))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("NOT_FOUND"));
     }
@@ -88,7 +105,7 @@ class RentalControllerTest {
         when(service.createRental(eq("RENT-001"), anyString()))
                 .thenThrow(new DuplicateRental("RENT-001"));
 
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .content("""
                                 {"businessKey":"RENT-001","title":"Red dress"}
@@ -99,7 +116,7 @@ class RentalControllerTest {
 
     @Test
     void invalidUuidReturns400() throws Exception {
-        mvc.perform(get("/api/v1/rentals/RENT-001"))
+        mvc.perform(get("/api/v1/rentals/RENT-001").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF"))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION"))
                 .andExpect(jsonPath("$.message")
@@ -108,7 +125,7 @@ class RentalControllerTest {
 
     @Test
     void malformedJsonReturns400() throws Exception {
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .content("{invalid"))
                 .andExpect(status().isBadRequest())
@@ -117,7 +134,7 @@ class RentalControllerTest {
 
     @Test
     void unsupportedMediaReturns415() throws Exception {
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("text/plain")
                         .content("Blue dress"))
                 .andExpect(status().isUnsupportedMediaType())
@@ -128,7 +145,7 @@ class RentalControllerTest {
     void titleLongerThan120Returns400() throws Exception {
         String title = "A".repeat(121);
 
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .content("""
                                 {"businessKey":"RENT-003","title":"%s"}
@@ -148,7 +165,7 @@ class RentalControllerTest {
                 .thenReturn(new RentalView(
                         id, "RENT-120", "BOOKED", title));
 
-        mvc.perform(post("/api/v1/rentals")
+        mvc.perform(post("/api/v1/rentals").with(jwt().authorities(new SimpleGrantedAuthority("ROLE_STAFF")))
                         .contentType("application/json")
                         .content("""
                                 {"businessKey":"RENT-120","title":"%s"}

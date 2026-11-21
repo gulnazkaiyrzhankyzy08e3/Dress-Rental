@@ -3,6 +3,10 @@ package com.example.rental.handler;
 
 import com.example.rental.domain.DuplicateRental;
 import com.example.rental.domain.MissingRental;
+import com.example.rental.domain.InvalidRentalTransition;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.access.AccessDeniedException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -104,6 +108,21 @@ public class ApiErrors {
 
         return error(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                 "UNSUPPORTED", "unsupported media type", request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> badLogin(AuthenticationException ex, HttpServletRequest request) {
+        return error(HttpStatus.UNAUTHORIZED, "UNAUTHENTICATED", "bad username or password", request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> forbidden(AccessDeniedException ex, HttpServletRequest request) {
+        return error(HttpStatus.FORBIDDEN, "FORBIDDEN", "not allowed for your role", request);
+    }
+
+    @ExceptionHandler(InvalidRentalTransition.class)
+    public ResponseEntity<ApiError> invalidTransition(InvalidRentalTransition ex, HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, "INVALID_TRANSITION", ex.getMessage(), request);
     }
 
     @ExceptionHandler(Exception.class)

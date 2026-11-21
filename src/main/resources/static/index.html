@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1">
+
+    <title>Clothing Rental | Secure Portal</title>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<main class="shell">
+
+    <header>
+        <span class="mark">CR</span>
+
+        <div>
+            <small>CSS-3008 · LAB 5</small>
+            <h1>Clothing Rental</h1>
+            <p>Secure rental operations · JWT access portal</p>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <aside class="panel intro">
+
+            <h2>Access control</h2>
+
+            <p>Signed sessions expire after 15 minutes.</p>
+
+            <div class="role">
+                <b>STAFF</b>
+                <p>Create, read and start rentals.</p>
+            </div>
+
+            <div class="role">
+                <b>MANAGER</b>
+                <p>Create, read, start and complete rentals.</p>
+            </div>
+
+            <h3>Security architecture</h3>
+
+            <p>JWT · HS256 · RBAC · BCrypt</p>
+
+            <p>
+                401 — Authentication required<br>
+                403 — Access denied<br>
+                409 — Business rule conflict
+            </p>
+
+            <hr>
+
+            <small>DEV ACCOUNTS ONLY</small>
+
+            <p>staff / staff-dev</p>
+            <p>manager / manager-dev</p>
+
+        </aside>
+
+        <section class="panel">
+
+            <!-- LOGIN -->
+
+            <div id="loginPane">
+
+                <h2>Sign in</h2>
+
+                <form id="loginForm">
+
+                    <label for="username">Username</label>
+
+                    <input id="username"
+                           autocomplete="username"
+                           required>
+
+                    <label for="password">Password</label>
+
+                    <input id="password"
+                           type="password"
+                           autocomplete="current-password"
+                           required>
+
+                    <button type="submit">
+                        Sign in securely
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- DASHBOARD -->
+
+            <div id="sessionPane" hidden>
+
+                <div class="top">
+
+                    <h2>Rental dashboard</h2>
+
+                    <button id="logout" class="secondary">
+                        Log out
+                    </button>
+
+                </div>
+
+                <!-- USER INFORMATION -->
+
+                <div class="identity">
+
+                    <strong id="who"></strong>
+
+                    <span id="role"></span>
+
+                    <span id="expiry"></span>
+
+                </div>
+
+                <!-- RENTAL STATUS -->
+
+                <h3>Current rental</h3>
+
+                <div class="rental">
+
+                    <div class="top">
+
+                        <strong id="item">
+                            No rental selected
+                        </strong>
+
+                        <span id="state" class="state">
+                            UNKNOWN
+                        </span>
+
+                    </div>
+
+                    <div class="steps">
+
+                        <span data-step="BOOKED">
+                            1 · BOOKED
+                        </span>
+
+                        <span data-step="RENTED">
+                            2 · RENTED
+                        </span>
+
+                        <span data-step="RETURNED">
+                            3 · RETURNED
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- CREATE RENTAL -->
+
+                <h3>1 · Create rental</h3>
+
+                <label for="businessKey">
+                    Business key
+                </label>
+
+                <input id="businessKey"
+                       placeholder="Auto-generated if empty">
+
+                <label for="title">
+                    Clothing item
+                </label>
+
+                <input id="title"
+                       value="Blue dress">
+
+                <button id="create">
+                    Create rental
+                </button>
+
+                <!-- MANAGE RENTAL -->
+
+                <h3>2 · Manage rental</h3>
+
+                <label for="rentalId">
+                    Rental UUID
+                </label>
+
+                <input id="rentalId"
+                       placeholder="UUID">
+
+                <div class="buttons">
+
+                    <button id="copy" class="secondary">
+                        Copy UUID
+                    </button>
+
+                    <button id="read" class="secondary">
+                        Read status
+                    </button>
+
+                    <button id="start">
+                        Start rental
+                    </button>
+
+                </div>
+
+                <!-- PROTECTED ACTION -->
+
+                <h3>3 · Protected action</h3>
+
+                <p id="permission"></p>
+
+                <button id="complete">
+                    Complete rental
+                </button>
+
+                <!-- ACTIVITY HISTORY -->
+
+                <h3>Session activity</h3>
+
+                <ul id="history"></ul>
+
+            </div>
+
+            <!-- API RESPONSE -->
+
+            <div class="output">
+
+                <div class="top">
+
+                    <h3>API response</h3>
+
+                    <span id="httpStatus">
+                        Ready
+                    </span>
+
+                </div>
+
+                <p id="notice" aria-live="polite"></p>
+
+                <pre id="result">Sign in to start.</pre>
+
+            </div>
+
+            <!-- SECURITY TEST -->
+
+            <button id="anonymous" class="link">
+                Test an API call without a token (401)
+            </button>
+
+        </section>
+
+    </div>
+
+    <footer>
+        Spring Boot · PostgreSQL · HS256 · Stateless Bearer authentication
+    </footer>
+
+</main>
+
+<script src="/app.js" defer></script>
+
+</body>
+</html>

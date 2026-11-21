@@ -9,3 +9,5 @@ app:
   downstream:
     base-url: http://localhost:9090
     timeout: 2s
+  jwt:
+    secret: clothing-rental-classroom-dev-key-2026-change-me-123456

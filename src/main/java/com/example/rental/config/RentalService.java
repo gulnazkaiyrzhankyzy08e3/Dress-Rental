@@ -1,69 +1,133 @@
-
 package com.example.rental.config;
 
 import com.example.rental.domain.*;
-import com.example.rental.persistence.RentalJpa;
-import com.example.rental.persistence.RentalMapper;
-import com.example.rental.persistence.RentalEntity;
-
-import org.springframework.dao.DataIntegrityViolationException;
+import com.example.rental.persistence.*;
+import jakarta.transaction.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class RentalService {
 
-    private final RentalRule rules;
-    private final RentalJpa repository;
+    private final RentalJpa rentals;
 
-    public RentalService(RentalRule rules, RentalJpa repository) {
-        this.rules = rules;
-        this.repository = repository;
-    }
+    private final RentalPolicy policy = new RentalPolicy(
+            List.of(new TransitionRule(), new StopFactorRule())
+    );
 
-    public RentalStatus move(RentalStatus from, RentalStatus to) {
-        rules.check(from, to);
-        return to;
+    public RentalService(RentalJpa rentals) {
+        this.rentals = rentals;
     }
 
     @Transactional
-    public RentalView createRental(String businessKey, String title) {
-        UUID id = UUID.randomUUID();
+    public RentalView createRental(String key, String title) {
 
-        try {
-            RentalEntity entity = RentalMapper.toEntity(
-                    id, businessKey,
-                    new RentalStatus.Booked(), title);
-
-            repository.insert(entity);
-            repository.flush();
-
-            return new RentalView(
-                    id, businessKey, "BOOKED", title);
-
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicateRental(businessKey);
+        if (rentals.count(key) > 0) {
+            throw new DuplicateRental(key);
         }
+
+        var row = RentalMapper.toEntity(
+                UUID.randomUUID(),
+                key,
+                new RentalStatus.Booked(),
+                title
+        );
+
+        rentals.insert(row);
+        rentals.flush();
+
+        return view(row);
     }
 
-    @Transactional(readOnly = true)
-    public RentalView require(UUID id) {
-        RentalEntity entity = repository.findById(id)
-                .orElseThrow(MissingRental::new);
+    @Transactional
+    public void createTwoRentals(String key, String title) {
+        createRental(key, title);
+        createRental(key, title);
+    }
 
-        return new RentalView(
-                entity.getId(),
-                entity.getBusinessKey(),
-                entity.getStatus(),
-                entity.getTitle()
+    @Transactional
+    public RentalView require(UUID id) {
+
+        return view(
+                rentals.findById(id)
+                        .orElseThrow(MissingRental::new)
         );
     }
 
+    // STAFF AND MANAGER
+    // BOOKED -> RENTED
+
     @Transactional
-    public void createTwoRentals(String businessKey, String title) {
-        createRental(businessKey, title);
-        createRental(businessKey, title);
+    @PreAuthorize("hasAnyRole('STAFF', 'MANAGER')")
+    public RentalView start(UUID id) {
+
+        var row = rentals.findById(id)
+                .orElseThrow(MissingRental::new);
+
+        RentalStatus current = switch (row.getStatus()) {
+            case "BOOKED" -> new RentalStatus.Booked();
+            case "RENTED" -> new RentalStatus.Rented();
+            case "RETURNED" -> new RentalStatus.Returned();
+            default -> throw new IllegalStateException(
+                    "Unknown rental status"
+            );
+        };
+
+        try {
+            policy.move(current, new RentalStatus.Rented());
+        } catch (IllegalStateException e) {
+            throw new InvalidRentalTransition(e.getMessage());
+        }
+
+        row.setStatus("RENTED");
+
+        return view(row);
+    }
+
+    // MANAGER ONLY
+    // RENTED -> RETURNED
+
+    @Transactional
+    @PreAuthorize("hasRole('MANAGER')")
+    public RentalView complete(UUID id, String actor) {
+
+        var row = rentals.findById(id)
+                .orElseThrow(MissingRental::new);
+
+        RentalStatus current = switch (row.getStatus()) {
+            case "BOOKED" -> new RentalStatus.Booked();
+            case "RENTED" -> new RentalStatus.Rented();
+            case "RETURNED" -> new RentalStatus.Returned();
+            default -> throw new IllegalStateException(
+                    "Unknown rental status"
+            );
+        };
+
+        try {
+            policy.move(current, new RentalStatus.Returned());
+        } catch (IllegalStateException e) {
+            throw new InvalidRentalTransition(e.getMessage());
+        }
+
+        row.setStatus("RETURNED");
+
+        org.slf4j.LoggerFactory
+                .getLogger(RentalService.class)
+                .info("Rental {} completed by {}", id, actor);
+
+        return view(row);
+    }
+
+    private RentalView view(RentalEntity row) {
+
+        return new RentalView(
+                row.getId(),
+                row.getBusinessKey(),
+                row.getStatus(),
+                row.getTitle()
+        );
     }
 }

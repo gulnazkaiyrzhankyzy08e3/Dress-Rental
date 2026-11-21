@@ -56,7 +56,20 @@ public class RentalController {
                     description = "Rental not found")
     })
     @GetMapping("/{id}")
+
     public RentalResponse get(@PathVariable UUID id) {
         return RentalResponse.from(service.require(id));
     }
+    @Operation(summary = "Start a clothing rental")
+    @PostMapping("/{id}/start")
+    public RentalResponse start(@PathVariable UUID id) {
+        return RentalResponse.from(service.start(id));
+    }
+
+    @Operation(summary = "Complete a clothing rental")
+    @PostMapping("/{id}/complete")
+    public RentalResponse complete(@PathVariable UUID id, org.springframework.security.core.Authentication authentication) {
+        return RentalResponse.from(service.complete(id, authentication.getName()));
+    }
 }
+
