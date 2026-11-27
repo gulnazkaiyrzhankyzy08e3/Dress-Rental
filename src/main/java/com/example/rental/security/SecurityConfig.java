@@ -44,7 +44,7 @@ import java.util.UUID;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // 1. Password hashing
+
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .createDelegatingPasswordEncoder();
     }
 
-    // 2. STAFF and MANAGER users
+  
 
     @Bean
     @Profile("dev")
@@ -72,7 +72,7 @@ public class SecurityConfig {
         );
     }
 
-    // 3. Authentication Manager
+
 
     @Bean
     AuthenticationManager authenticationManager(
@@ -88,7 +88,6 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
-    // 4. JWT Secret Key
 
     @Bean
     SecretKey jwtKey(
@@ -110,7 +109,6 @@ public class SecurityConfig {
         );
     }
 
-    // 5. JWT Encoder
 
     @Bean
     JwtEncoder jwtEncoder(SecretKey key) {
@@ -120,7 +118,7 @@ public class SecurityConfig {
         );
     }
 
-    // 6. JWT Decoder
+
 
     @Bean
     JwtDecoder jwtDecoder(SecretKey key) {
@@ -139,7 +137,7 @@ public class SecurityConfig {
         return decoder;
     }
 
-    // 7. JWT Role Converter
+ 
 
     @Bean
     JwtAuthenticationConverter rolesFromToken() {
@@ -158,7 +156,7 @@ public class SecurityConfig {
         return converter;
     }
 
-    // 8. Correlation ID
+ 
 
     private static String correlation(
             HttpServletRequest request) {
@@ -172,7 +170,6 @@ public class SecurityConfig {
                 : id;
     }
 
-    // 9. Security error response
 
     private static void writeError(
             HttpServletRequest request,
@@ -203,8 +200,7 @@ public class SecurityConfig {
         );
     }
 
-    // 10. Security Filter Chain
-
+ 
     @Bean
     SecurityFilterChain api(
             HttpSecurity http,
@@ -234,7 +230,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(r -> r
 
-                        // Public website
+                    
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -245,28 +241,26 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                        // Internal error handling
+                     
 
                         .dispatcherTypeMatchers(
                                 DispatcherType.ERROR
                         ).permitAll()
 
-                        // Public login endpoint
+                  
 
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/auth/login"
                         ).permitAll()
 
-                        // Health check
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/actuator/health"
                         ).permitAll()
 
-                        // Swagger
-
+                     
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -274,16 +268,14 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // MANAGER only
-                        // RENTED -> RETURNED
+                       
 
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/v1/rentals/*/complete"
                         ).hasRole("MANAGER")
 
-                        // STAFF and MANAGER
-                        // BOOKED -> RENTED
+                     
 
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -293,7 +285,7 @@ public class SecurityConfig {
                                 "MANAGER"
                         )
 
-                        // Protected API
+                      
 
                         .requestMatchers(
                                 "/api/v1/**",
@@ -303,12 +295,12 @@ public class SecurityConfig {
                                 "MANAGER"
                         )
 
-                        // Block other endpoints
+                     
 
                         .anyRequest().denyAll()
                 )
 
-                // Stateless JWT authentication
+            
 
                 .csrf(c -> c.disable())
 
@@ -322,14 +314,14 @@ public class SecurityConfig {
 
                 .httpBasic(b -> b.disable())
 
-                // 401 and 403 responses
+              
 
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(unauth)
                         .accessDeniedHandler(forbidden)
                 )
 
-                // JWT Resource Server
+               
 
                 .oauth2ResourceServer(o -> o
                         .jwt(j ->
