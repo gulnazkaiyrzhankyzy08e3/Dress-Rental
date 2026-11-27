@@ -57,8 +57,6 @@ public class RentalService {
         );
     }
 
-    // STAFF AND MANAGER
-    // BOOKED -> RENTED
 
     @Transactional
     @PreAuthorize("hasAnyRole('STAFF', 'MANAGER')")
@@ -87,8 +85,7 @@ public class RentalService {
         return view(row);
     }
 
-    // MANAGER ONLY
-    // RENTED -> RETURNED
+ 
 
     @Transactional
     @PreAuthorize("hasRole('MANAGER')")
