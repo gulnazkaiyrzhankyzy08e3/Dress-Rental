@@ -323,9 +323,9 @@ public class SecurityConfig {
 
                
 
-                .oauth2ResourceServer(o -> o
-                        .jwt(j ->
-                                j.jwtAuthenticationConverter(
+                .oauth2ResourceServer(o -> o      ///Бұл жерде Spring Security-ге JWT арқылы келген сұраныстарды өңдеуді тапсырамыз.Бірақ біздің жобада толық OAuth2 авторизация жүйесі жоқ. 
+                        .jwt(j ->                    ///Ол Authorization Header ішінен Bearer токенін алады, JwtDecoder арқылы тексереді, JwtAuthenticationConverter арқылы рөлдерді алады.
+                                j.jwtAuthenticationConverter( //Біз оның Resource Server механизмін JWT тексеру үшін қолданамыз.
                                         rolesFromToken()
                                 )
                         )
